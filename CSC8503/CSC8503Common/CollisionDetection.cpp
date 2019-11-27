@@ -20,7 +20,16 @@ bool CollisionDetection::RayPlaneIntersection(const Ray&r, const Plane&p, RayCol
 }
 
 bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCollision& collision) {
-	return false;
+	const Transform& transform = object.GetConstTransform();
+	const CollisionVolume* volume = object.GetBoundingVolume();
+
+	if (!volume)
+		return false;
+
+	switch (volume->type) {
+	case VolumeType::AABB:
+		return; // i was here page 13
+	}
 }
 
 bool CollisionDetection::RayBoxIntersection(const Ray&r, const Vector3& boxPos, const Vector3& boxSize, RayCollision& collision) {
