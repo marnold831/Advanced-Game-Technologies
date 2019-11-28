@@ -42,10 +42,10 @@ void Camera::UpdateCamera(float dt) {
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SHIFT)) {
-		position.y += frameSpeed;
+		position.y -= frameSpeed;
 	}
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE)) {
-		position.y -= frameSpeed;
+		position.y += frameSpeed;
 	}
 }
 

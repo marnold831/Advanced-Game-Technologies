@@ -23,19 +23,20 @@ namespace NCL {
 
 		class Ray {
 		public:
-			Ray(Vector3 position, Vector3 direction) {
-				this->position  = position;
-				this->direction = direction;
-			}
+			Ray(Vector3 position, Vector3 direction, uint32_t mask = UINT32_MAX) : position(position), direction(direction), mask(mask){ }
 			~Ray(void) {}
 
 			Vector3 GetPosition() const {return position;	}
 
 			Vector3 GetDirection() const {return direction;	}
 
+			uint32_t GetMask() const { return mask; }
+			void SetMask(uint32_t _mask) { mask = _mask; }
+
 		protected:
 			Vector3 position;	//World space position
 			Vector3 direction;	//Normalised world space direction
+			uint32_t mask;
 		};
 	}
 }

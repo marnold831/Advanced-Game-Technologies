@@ -3,14 +3,17 @@
 
 using namespace NCL::CSC8503;
 
-GameObject::GameObject(string objectName)	{
+GameObject::GameObject(string objectName, uint32_t _layer)	{
 	name			= objectName;
+	layer			= _layer;
 	isActive		= true;
 	boundingVolume	= nullptr;
 	physicsObject	= nullptr;
 	renderObject	= nullptr;
 	networkObject	= nullptr;
 }
+
+
 
 GameObject::~GameObject()	{
 	delete boundingVolume;

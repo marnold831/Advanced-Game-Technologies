@@ -249,7 +249,8 @@ bool TutorialGame::SelectObject() {
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
-
+			
+			ray.SetMask((1 << 2));
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				selectionObject = (GameObject*)closestCollision.node;
@@ -286,6 +287,23 @@ line - after the third, they'll be able to twist under torque aswell.
 
 void TutorialGame::MoveSelectedObject() {
 
+	renderer->DrawString("Click Force: " + std::to_string(forceMagnitude), Vector2(10, 20));
+
+	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.f;
+
+	if (!selectionObject)
+		return;
+
+	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
+		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+
+		RayCollision closestCollision;
+		if (world->Raycast(ray, closestCollision, true)) {
+			if (closestCollision.node == selectionObject) {
+				selectionObject->GetPhysicsObject()->AddForce(ray.GetDirection() * forceMagnitude);
+			}
+		}
+	}
 }
 
 void TutorialGame::InitCamera() {
@@ -366,7 +384,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 }
 
 GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
-	GameObject* cube = new GameObject();
+	GameObject* cube = new GameObject("", (1 << 1));
 
 	AABBVolume* volume = new AABBVolume(dimensions);
 
