@@ -1,7 +1,7 @@
 #include "CollisionDetection.h"
 #include "CollisionVolume.h"
 #include "AABBVolume.h"
-#include "OBBVolume.h"
+#include "OOBBVolume.h"
 #include "SphereVolume.h"
 #include "../../Common/Vector2.h"
 #include "../../Common/Window.h"
@@ -29,8 +29,8 @@ bool CollisionDetection::RayIntersection(const Ray& r,GameObject& object, RayCol
 	switch (volume->type) {
 	case VolumeType::AABB:
 		return RayAABBIntersection(r, transform, (const AABBVolume&)* volume, collision);
-	case VolumeType::OBB:
-		return RayOBBIntersection(r, transform, (const OBBVolume&)* volume, collision);
+	case VolumeType::OOBB:
+		return RayOBBIntersection(r, transform, (const OOBBVolume&)* volume, collision);
 	case VolumeType::Sphere:
 		return RaySphereIntersection(r, transform, (const SphereVolume&)* volume, collision);
 	}
@@ -76,7 +76,7 @@ bool CollisionDetection::RayAABBIntersection(const Ray&r, const Transform& world
 	return RayBoxIntersection(r, boxPos, boxSize, collision);
 }
 
-bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume& volume, RayCollision& collision) {
+bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OOBBVolume& volume, RayCollision& collision) {
 	Quaternion orientation = worldTransform.GetWorldOrientation();
 	Vector3 position = worldTransform.GetWorldPosition();
 
@@ -119,35 +119,220 @@ bool CollisionDetection::RaySphereIntersection(const Ray&r, const Transform& wor
 }
 
 bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, CollisionInfo& collisionInfo) {
+	const CollisionVolume* volA = a->GetBoundingVolume();
+	const CollisionVolume* volB = b->GetBoundingVolume();
+
+	if (!volA || !volB)
+		return false;
+
+	collisionInfo.a = a;
+	collisionInfo.b = b;
+
+	const Transform& transformA = a->GetConstTransform();
+	const Transform& transformB = b->GetConstTransform();
+
+	VolumeType pairType = (VolumeType)((int)volA->type | (int)volB->type);
+
+	if (pairType == VolumeType::AABB)
+		return AABBIntersection((AABBVolume&)* volA, transformA, (AABBVolume&)* volB, transformB, collisionInfo);
+
+	if (pairType == VolumeType::Sphere)
+		return SphereIntersection((SphereVolume&)* volA, transformA, (SphereVolume&)* volB, transformB, collisionInfo);
+
+	if (pairType == VolumeType::OOBB)
+		std::cout << "OOBB CollisionDetection " << OBBIntersection((OOBBVolume&)* volA, transformA, (OOBBVolume&)* volB, transformB, collisionInfo) << std::endl;
+;
+
+	if (volA->type == VolumeType::AABB && volB->type == VolumeType::OOBB)
+		std::cout << "AABB / OBB collisionDetection " << AABBOOBBIntersection((AABBVolume&)* volA, transformA, (OOBBVolume&)* volB, transformB, collisionInfo) << std::endl;
+
+	if (volB->type == VolumeType::OOBB && volA->type == VolumeType::AABB) {
+		collisionInfo.a = b;
+		collisionInfo.b = a;
+		std::cout << "AABB / OOBB collisionDetection " << AABBOOBBIntersection((AABBVolume&)* volB, transformB, (OOBBVolume&)* volA, transformA, collisionInfo) << std::endl;
+	}
+	if (volA->type == VolumeType::AABB && volB->type == VolumeType::Sphere)
+		return AABBSphereIntersection((AABBVolume&)* volA, transformA, (SphereVolume&)* volB, transformB, collisionInfo);
+
+	if (volA->type == VolumeType::Sphere && volB->type == VolumeType::AABB) {
+		collisionInfo.a = b;
+		collisionInfo.b = a;
+		return AABBSphereIntersection((AABBVolume&)* volB, transformB, (SphereVolume&)* volA, transformA, collisionInfo);
+	
+	}
 	return false;
+
 }
 
 bool CollisionDetection::AABBTest(const Vector3& posA, const Vector3& posB, const Vector3& halfSizeA, const Vector3& halfSizeB) {
+	
+	Vector3 delta = posB - posA;
+	Vector3 totalSize = halfSizeA + halfSizeB;
+
+	if (abs(delta.x) < totalSize.x && abs(delta.y) < totalSize.y && abs(delta.z) < totalSize.x)
+		return true;
+
 	return false;
 }
 
 //AABB/AABB Collisions
-bool CollisionDetection::AABBIntersection(const AABBVolume& volumeA, const Transform& worldTransformA,
-	const AABBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+bool CollisionDetection::AABBIntersection(const AABBVolume& volumeA, const Transform& worldTransformA, const AABBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+	
+	Vector3 boxAPos = worldTransformA.GetWorldPosition();
+	Vector3 boxBPos = worldTransformB.GetWorldPosition();
+	Vector3 boxASize = volumeA.GetHalfDimensions();
+	Vector3 boxBSize = volumeB.GetHalfDimensions();
+
+	bool overlap = AABBTest(boxAPos, boxBPos, boxASize, boxBSize);
+
+	if (overlap) {
+		static const Vector3 faces[6] = {
+			Vector3(-1, 0,  0), Vector3(1, 0, 0),
+			Vector3(0, -1,  0), Vector3(0, 1, 0),
+			Vector3(0,  0, -1), Vector3(0, 0 ,1)
+		};
+
+		Vector3 maxA = boxAPos + boxASize;
+		Vector3 minA = boxAPos - boxASize;
+
+		Vector3 maxB = boxBPos + boxBSize;
+		Vector3 minB = boxBPos - boxBSize;
+
+		float distances[6] = {
+			(maxB.x - minA.x),
+			(maxA.x - minB.x),
+			(maxB.y - minA.y),
+			(maxA.y - minB.y),
+			(maxB.z - minA.z),
+			(maxA.z - minB.z)
+		};
+
+		float penetration = FLT_MAX;
+		Vector3 bestAxis;
+
+		for (size_t i = 0; i < 6; ++i) {
+			if (distances[i] < penetration) {
+				penetration = distances[i];
+				bestAxis = faces[i];
+			}
+		}
+		collisionInfo.AddContactPoint(Vector3(), Vector3(), bestAxis, penetration);
+		return true;
+	}
 	return false;
 }
 
 //Sphere / Sphere Collision
-bool CollisionDetection::SphereIntersection(const SphereVolume& volumeA, const Transform& worldTransformA,
-	const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+bool CollisionDetection::SphereIntersection(const SphereVolume& volumeA, const Transform& worldTransformA, const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+
+	float radii = volumeA.GetRadius() + volumeB.GetRadius();
+	Vector3 delta = worldTransformB.GetWorldPosition() - worldTransformA.GetWorldPosition();
+
+	float deltaLength = delta.LengthSquared();
+
+	if (deltaLength < radii * radii) {
+		float penetration = (radii - delta.Length());
+		Vector3 normal = delta.Normalised();
+		Vector3 localA = normal * volumeA.GetRadius();
+		Vector3 localB = -normal * volumeB.GetRadius();
+
+		collisionInfo.AddContactPoint(localA, localB, normal, penetration);
+		return true;
+
+	}
 	return false;
 }
 
 //AABB - Sphere Collision
-bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const Transform& worldTransformA,
-	const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const Transform& worldTransformA, const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+	
+	Vector3 boxSize = volumeA.GetHalfDimensions();
+	Vector3 delta = worldTransformB.GetWorldPosition() - worldTransformA.GetWorldPosition();
+	Vector3 closestPointOnBox = Maths::Clamp(delta, -boxSize, boxSize);
+
+	Vector3 localPoint = delta - closestPointOnBox;
+	float distance = localPoint.Length();
+
+	if (distance < volumeB.GetRadius()) {
+		Vector3 collisionNormal = localPoint.Normalised();
+		float penetration = (volumeB.GetRadius() - distance);
+		
+		Vector3 localA = Vector3();
+		Vector3 localB = -collisionNormal * volumeB.GetRadius();
+
+		collisionInfo.AddContactPoint(localA, localB, collisionNormal, penetration);
+		return true;
+	}
 	return false;
 }
 
-bool CollisionDetection::OBBIntersection(
-	const OBBVolume& volumeA, const Transform& worldTransformA,
-	const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
-	return false;
+bool CollisionDetection::OBBIntersection(const OOBBVolume& volumeA, const Transform& worldTransformA, 
+										 const OOBBVolume& volumeB, const Transform& worldTransformB, 
+										 CollisionInfo& collisionInfo) {
+	
+	Quaternion orientationA = worldTransformA.GetWorldOrientation();
+	Quaternion orientationB = worldTransformB.GetWorldOrientation();
+	
+
+	Vector3 posA = worldTransformA.GetWorldPosition();
+	Vector3 posB = worldTransformB.GetWorldPosition();
+
+	Vector3 relativePos = worldTransformB.GetWorldPosition() - worldTransformA.GetWorldPosition();
+	Vector3 halfDimensionsA = volumeA.GetHalfDimensions();
+	Vector3 halfDimensionsB = volumeB.GetHalfDimensions();
+
+	static const Vector3 face[3] = {
+		Vector3(1, 0, 0),
+		Vector3(0, 1, 0),
+		Vector3(0, 0 ,1)
+	};
+
+	static Vector3 faceA[3] = {
+		(orientationA * face[0]),
+		(orientationA * face[1]),
+		(orientationA * face[2])
+	};
+	static Vector3 faceB[3] = {
+		(orientationB * face[0]),
+		(orientationB * face[1]),
+		(orientationB * face[2])
+	};
+	float penetrationDist = 0.0f;
+
+	return(!OBBSeperatingPlane(relativePos, faceA[0], halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, faceA[1], halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, faceA[2], halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, faceB[0], halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, faceB[1], halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, faceB[2], halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[0], faceB[0]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[0], faceB[1]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[0], faceB[2]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[1], faceB[0]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[1], faceB[1]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[1], faceB[2]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[2], faceB[0]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[2], faceB[1]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist) &&
+		!OBBSeperatingPlane(relativePos, Vector3::Cross(faceA[2], faceB[2]), halfDimensionsA, halfDimensionsB, faceA, faceB, penetrationDist));
+
+
+}
+
+bool NCL::CollisionDetection::OBBSeperatingPlane(Vector3 relativePos, Vector3 plane, Vector3 halfSizeA, Vector3 halfSizeB, Vector3 faceA[], Vector3 faceB[], float& penetrationDist) {	
+
+	float result = fabs(Vector3::Dot(relativePos, plane));
+	
+
+	float total = fabs(Vector3::Dot((faceA[0] * halfSizeA.x), plane)) +
+		fabs(Vector3::Dot((faceA[1] * halfSizeA.y), plane)) +
+		fabs(Vector3::Dot((faceA[2] * halfSizeA.z), plane)) +
+		fabs(Vector3::Dot((faceB[0] * halfSizeB.x), plane)) +
+		fabs(Vector3::Dot((faceB[1] * halfSizeB.y), plane)) +
+		fabs(Vector3::Dot((faceB[2] * halfSizeB.z), plane));
+	
+	if (penetrationDist > abs(result - total))
+		penetrationDist = abs(result - total);
+	return result > total;		
 }
 
 //It's helper functions for generating rays from here on out:

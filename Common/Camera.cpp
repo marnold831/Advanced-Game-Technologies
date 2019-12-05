@@ -25,7 +25,7 @@ void Camera::UpdateCamera(float dt) {
 		yaw -= 360.0f;
 	}
 
-	float frameSpeed = 200 * dt;
+	float frameSpeed = speed * dt;
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::W)) {
 		position += Matrix4::Rotation(yaw, Vector3(0, 1, 0)) * Vector3(0, 0, -1) * frameSpeed;
@@ -46,6 +46,14 @@ void Camera::UpdateCamera(float dt) {
 	}
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::SPACE)) {
 		position.y += frameSpeed;
+	}
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::MINUS)) {
+		speed -= 0.1f;
+		std::cout << "FrameSpeed " << speed << std::endl;
+	}
+	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::PLUS)) {
+		speed += 0.1f;
+		std::cout << "FrameSpeed " << speed << std::endl;
 	}
 }
 

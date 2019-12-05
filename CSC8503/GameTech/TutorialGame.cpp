@@ -250,7 +250,7 @@ bool TutorialGame::SelectObject() {
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 			
-			ray.SetMask((1 << 2));
+			ray.SetMask(UINT32_MAX);
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				selectionObject = (GameObject*)closestCollision.node;
@@ -300,7 +300,7 @@ void TutorialGame::MoveSelectedObject() {
 		RayCollision closestCollision;
 		if (world->Raycast(ray, closestCollision, true)) {
 			if (closestCollision.node == selectionObject) {
-				selectionObject->GetPhysicsObject()->AddForce(ray.GetDirection() * forceMagnitude);
+				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
 			}
 		}
 	}
@@ -319,14 +319,18 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	InitMixedGridWorld(10, 10, 3.5f, 3.5f);
-	AddGooseToWorld(Vector3(30, 2, 0));
-	AddAppleToWorld(Vector3(35, 2, 0));
+	//InitMixedGridWorld(10, 10, 5.0f, 5.0f);
+	//InitSphereGridWorld(10, 10, 5.0f, 5.0f, 1.0f);
+	InitCubeGridWorld(3, 3, 5.0f, 5.0f, Vector3(1, 1, 1));
+	//AddGooseToWorld(Vector3(30, 2, 0));
+	//AddAppleToWorld(Vector3(35, 2, 0));
 
-	AddParkKeeperToWorld(Vector3(40, 2, 0));
-	AddCharacterToWorld(Vector3(45, 2, 0));
+	//AddParkKeeperToWorld(Vector3(40, 2, 0));
+	//AddCharacterToWorld(Vector3(45, 2, 0));
 
-	AddFloorToWorld(Vector3(0, -2, 0));
+	//AddFloorToWorld(Vector3(0,-2,0));
+
+	
 }
 
 //From here on it's functions to add in objects to the world!
@@ -337,7 +341,7 @@ A single function to add a large immoveable cube to the bottom of our world
 
 */
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject();
+	GameObject* floor = new GameObject("floor");
 
 	Vector3 floorSize = Vector3(100, 2, 100);
 	AABBVolume* volume = new AABBVolume(floorSize);
@@ -364,7 +368,7 @@ physics worlds. You'll probably need another function for the creation of OBB cu
 
 */
 GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, float inverseMass) {
-	GameObject* sphere = new GameObject();
+	GameObject* sphere = new GameObject("Sphere");
 
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius);
@@ -384,10 +388,10 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 }
 
 GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
-	GameObject* cube = new GameObject("", (1 << 1));
+	GameObject* cube = new GameObject("Cube");
 
 	AABBVolume* volume = new AABBVolume(dimensions);
-
+	//OOBBVolume* volume = new OOBBVolume(dimensions);
 	cube->SetBoundingVolume((CollisionVolume*)volume);
 
 	cube->GetTransform().SetWorldPosition(position);
@@ -409,7 +413,7 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	float size			= 1.0f;
 	float inverseMass	= 1.0f;
 
-	GameObject* goose = new GameObject();
+	GameObject* goose = new GameObject("goose");
 
 
 	SphereVolume* volume = new SphereVolume(size);
@@ -434,7 +438,7 @@ GameObject* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 	float meshSize = 4.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* keeper = new GameObject();
+	GameObject* keeper = new GameObject("keeper");
 
 	AABBVolume* volume = new AABBVolume(Vector3(0.3, 0.9f, 0.3) * meshSize);
 	keeper->SetBoundingVolume((CollisionVolume*)volume);
@@ -467,7 +471,7 @@ GameObject* TutorialGame::AddCharacterToWorld(const Vector3& position) {
 		minVal.y = min(minVal.y, i.y);
 	}
 
-	GameObject* character = new GameObject();
+	GameObject* character = new GameObject("character");
 
 	float r = rand() / (float)RAND_MAX;
 
@@ -490,7 +494,7 @@ GameObject* TutorialGame::AddCharacterToWorld(const Vector3& position) {
 }
 
 GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
-	GameObject* apple = new GameObject();
+	GameObject* apple = new GameObject("apple");
 
 	SphereVolume* volume = new SphereVolume(0.7f);
 	apple->SetBoundingVolume((CollisionVolume*)volume);
@@ -515,12 +519,12 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 			AddSphereToWorld(position, radius, 1.0f);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
 	float sphereRadius = 1.0f;
-	Vector3 cubeDims = Vector3(1, 1, 1);
+	Vector3 cubeDims = Vector3(1, 2, 2);
 
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
@@ -534,17 +538,17 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 			}
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	
 }
 
 void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims) {
 	for (int x = 1; x < numCols+1; ++x) {
 		for (int z = 1; z < numRows+1; ++z) {
-			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
+			Vector3 position = Vector3(x* colSpacing, 10.0f, z*rowSpacing);
 			AddCubeToWorld(position, cubeDims, 1.0f);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -584,8 +588,8 @@ void TutorialGame::SimpleGJKTest() {
 	delete fallingCube->GetBoundingVolume();
 	delete newFloor->GetBoundingVolume();
 
-	fallingCube->SetBoundingVolume((CollisionVolume*)new OBBVolume(dimensions));
-	newFloor->SetBoundingVolume((CollisionVolume*)new OBBVolume(floorDimensions));
+	fallingCube->SetBoundingVolume((CollisionVolume*)new OOBBVolume(dimensions));
+	newFloor->SetBoundingVolume((CollisionVolume*)new OOBBVolume(floorDimensions));
 
 }
 

@@ -137,13 +137,14 @@
     <ClInclude Include="BoundingOOBB.h" />
     <ClInclude Include="BoundingSphere.h" />
     <ClInclude Include="BoundingVolume.h" />
+    <ClInclude Include="BoundingCapsule.h" />
     <ClInclude Include="NavigationGrid.h" />
     <ClInclude Include="NavigationMap.h" />
     <ClInclude Include="NavigationMesh.h" />
     <ClInclude Include="NavigationPath.h" />
     <ClInclude Include="NetworkObject.h" />
     <ClInclude Include="NetworkState.h" />
-    <ClInclude Include="OBBVolume.h" />
+    <ClInclude Include="OOBBVolume.h" />
     <ClInclude Include="SphereVolume.h" />
     <ClInclude Include="CollisionVolume.h" />
     <ClInclude Include="CollisionDetection.h" />

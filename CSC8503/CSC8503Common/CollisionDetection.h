@@ -7,7 +7,7 @@
 #include "GameObject.h"
 
 #include "AABBVolume.h"
-#include "OBBVolume.h"
+#include "OOBBVolume.h"
 #include "SphereVolume.h"
 #include "Ray.h"
 
@@ -62,7 +62,7 @@ namespace NCL {
 		static bool RayIntersection(const Ray&r, GameObject& object, RayCollision &collisions);
 		static bool RayBoxIntersection(const Ray&r, const Vector3& boxPos, const Vector3& boxSize, RayCollision& collision);
 		static bool RayAABBIntersection(const Ray&r, const Transform& worldTransform, const AABBVolume&	volume, RayCollision& collision);
-		static bool RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume&	volume, RayCollision& collision);
+		static bool RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OOBBVolume&	volume, RayCollision& collision);
 		static bool RaySphereIntersection(const Ray&r, const Transform& worldTransform, const SphereVolume& volume, RayCollision& collision);
 
 		static bool RayPlaneIntersection(const Ray&r, const Plane&p, RayCollision& collisions);
@@ -82,8 +82,13 @@ namespace NCL {
 		static bool AABBSphereIntersection(	const AABBVolume& volumeA	 , const Transform& worldTransformA,
 										const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
-		static bool OBBIntersection(	const OBBVolume& volumeA, const Transform& worldTransformA,
-										const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
+		static bool OBBIntersection(	const OOBBVolume& volumeA, const Transform& worldTransformA,
+										const OOBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
+
+		static bool AABBOOBBIntersection( const AABBVolume& volumeA, const Transform& worldTransformA,
+										const OOBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& colisionInfo);
+
+		static bool OBBSeperatingPlane(Vector3 relativePos, Vector3 plane, Vector3 halfSizeA, Vector3 halfSizeB, Vector3 faceA[], Vector3 faceB[], float& penetrationDist);
 
 		//Boring helper functions to project screen positions to world positions (used by raycasting!)
 		static Vector3 Unproject(const Vector3& screenPos, const Camera& cam);
