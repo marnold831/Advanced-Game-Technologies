@@ -82,8 +82,8 @@ namespace NCL {
 		static bool AABBSphereIntersection(	const AABBVolume& volumeA	 , const Transform& worldTransformA,
 										const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
-		static bool OBBIntersection(	const OBBVolume& volumeA, const Transform& worldTransformA,
-										const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
+		static bool OBBIntersection(const OBBVolume& volumeA, const Transform& worldTransformA,
+			const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
 		//Boring helper functions to project screen positions to world positions (used by raycasting!)
 		static Vector3 Unproject(const Vector3& screenPos, const Camera& cam);

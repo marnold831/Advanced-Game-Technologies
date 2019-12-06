@@ -25,6 +25,8 @@ namespace NCL {
 			farPlane	= 100.0f;
 
 			camType		= CameraType::Perspective;
+
+			speed = 50.0f;
 		};
 
 		Camera(float pitch, float yaw, const Vector3& position) : Camera() {
@@ -95,6 +97,7 @@ namespace NCL {
 		float	right;
 		float	top;
 		float	bottom;
+		float	speed;
 
 		float	fov;
 		float	yaw;

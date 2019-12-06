@@ -1,9 +1,12 @@
 #include "TutorialGame.h"
+#include <fstream>
 #include "../CSC8503Common/GameWorld.h"
 #include "../../Plugins/OpenGLRendering/OGLMesh.h"
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
+
+#include "../../Common/Assets.h"
 
 #include "../CSC8503Common/PositionConstraint.h"
 
@@ -66,6 +69,9 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
+	Vector3 cameraPos = world->GetMainCamera()->GetPosition();
+	string text = "position: (" + std::to_string(cameraPos.x) + "," + std::to_string(cameraPos.y) + "," + std::to_string(cameraPos.z) +")";
+	Debug::Print(text, Vector2(10, 55));
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
@@ -250,7 +256,6 @@ bool TutorialGame::SelectObject() {
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 			
-			ray.SetMask((1 << 2));
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				selectionObject = (GameObject*)closestCollision.node;
@@ -300,7 +305,7 @@ void TutorialGame::MoveSelectedObject() {
 		RayCollision closestCollision;
 		if (world->Raycast(ray, closestCollision, true)) {
 			if (closestCollision.node == selectionObject) {
-				selectionObject->GetPhysicsObject()->AddForce(ray.GetDirection() * forceMagnitude);
+				selectionObject->GetPhysicsObject()->AddForceAtPosition(ray.GetDirection() * forceMagnitude, closestCollision.collidedAt);
 			}
 		}
 	}
@@ -319,13 +324,13 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	InitMixedGridWorld(10, 10, 3.5f, 3.5f);
+	//InitMixedGridWorld(10, 10, 3.5f, 3.5f);
 	AddGooseToWorld(Vector3(30, 2, 0));
-	AddAppleToWorld(Vector3(35, 2, 0));
+	//AddAppleToWorld(Vector3(35, 2, 0));
 
-	AddParkKeeperToWorld(Vector3(40, 2, 0));
-	AddCharacterToWorld(Vector3(45, 2, 0));
-
+	//AddParkKeeperToWorld(Vector3(40, 2, 0));
+	//AddCharacterToWorld(Vector3(45, 2, 0));
+	InitWorldFromFile("TestGrid1.txt");
 	AddFloorToWorld(Vector3(0, -2, 0));
 }
 
@@ -384,7 +389,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 }
 
 GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
-	GameObject* cube = new GameObject("", (1 << 1));
+	GameObject* cube = new GameObject();
 
 	AABBVolume* volume = new AABBVolume(dimensions);
 
@@ -508,6 +513,7 @@ GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
 	return apple;
 }
 
+
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
 	for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
@@ -515,7 +521,7 @@ void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacin
 			AddSphereToWorld(position, radius, 1.0f);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -534,7 +540,7 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 			}
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	
 }
 
 void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims) {
@@ -544,7 +550,33 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 			AddCubeToWorld(position, cubeDims, 1.0f);
 		}
 	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	
+}
+
+void NCL::CSC8503::TutorialGame::InitWorldFromFile(const std::string& filename) {
+	int nodeSize;
+	int gridWidth;
+	int gridHeight;
+	std::ifstream infile(Assets::DATADIR + filename);
+
+	infile >> nodeSize;
+	infile >> gridWidth;
+	infile >> gridHeight;
+
+	for (int y = 0; y < gridHeight; ++y) {
+		for (int x = 0; x < gridWidth; ++x) {
+			char type = 0;
+			infile >> type;
+
+			if (type == 'x') {
+				int cubeDimension = 100 / gridWidth;
+				Vector3 position = Vector3((x * gridWidth) /2, 0, (y * gridHeight) /2);
+				ConvertFromNavSpaceToWorldSpace(position);
+				position.y = position.y + 5;
+				AddCubeToWorld(position, Vector3(cubeDimension, cubeDimension, cubeDimension), 0.0f);
+			}
+		}
+	}
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -589,3 +621,8 @@ void TutorialGame::SimpleGJKTest() {
 
 }
 
+bool NCL::CSC8503::TutorialGame::ConvertFromNavSpaceToWorldSpace(Vector3& pos)
+{
+	pos = pos - Vector3(95, 0, 95);
+	return true;
+}

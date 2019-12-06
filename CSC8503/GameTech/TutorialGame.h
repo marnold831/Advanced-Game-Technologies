@@ -28,6 +28,7 @@ namespace NCL {
 			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
+			void InitWorldFromFile(const std::string& filename);
 			void BridgeConstraintTest();
 			void SimpleGJKTest();
 
@@ -76,6 +77,8 @@ namespace NCL {
 			void LockCameraToObject(GameObject* o) {
 				lockedObject = o;
 			}
+
+			bool ConvertFromNavSpaceToWorldSpace(Vector3& pos);
 		};
 	}
 }
