@@ -32,10 +32,12 @@ namespace NCL {
 		class NavigationGrid : public NavigationMap	{
 		public:
 			NavigationGrid();
-			NavigationGrid(const std::string&filename);
+			NavigationGrid(const std::string&filename, float offset);
 			~NavigationGrid();
 
 			bool FindPath(const Vector3& from, const Vector3& to, NavigationPath& outPath) override;
+
+			void SetOffset(float _offSet) { offSet = _offSet; }
 				
 		protected:
 			bool		NodeInList(GridNode* n, std::vector<GridNode*>& list) const;
@@ -44,6 +46,7 @@ namespace NCL {
 			int nodeSize;
 			int gridWidth;
 			int gridHeight;
+			float offSet;
 
 			GridNode* allNodes;
 		};

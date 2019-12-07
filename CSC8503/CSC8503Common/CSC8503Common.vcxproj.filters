@@ -123,6 +123,9 @@
     <ClInclude Include="Debug.h">
       <Filter>Other</Filter>
     </ClInclude>
+    <ClInclude Include="GooseObject.h">
+      <Filter>Other</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CollisionDetection.cpp">
@@ -198,6 +201,9 @@
       <Filter>Other</Filter>
     </ClCompile>
     <ClCompile Include="Transform.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="GooseObject.cpp">
       <Filter>Other</Filter>
     </ClCompile>
   </ItemGroup>

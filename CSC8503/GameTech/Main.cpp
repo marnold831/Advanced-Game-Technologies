@@ -24,18 +24,19 @@ void TestNetworking() {
 vector<Vector3> testNodes;
 
 void TestPathfinding() {
-	NavigationGrid grid("TestGrid1.txt");
+	NavigationGrid grid("TestGrid1.txt", 100.0f);
 
 	NavigationPath outPath;
 
-	Vector3 startPos(20, 0, 10);
-	Vector3 endPos(100, 0, 150);
+	Vector3 startPos(-70, 0, -70);
+	Vector3 endPos(60, 0, 60); // now real world positions
+	grid.SetOffset(100.0f); //half the floors width. the floor stems from -100 to 100
 
 	bool found = grid.FindPath(startPos, endPos, outPath);
 
 	Vector3 pos;
 	while (outPath.PopWaypoint(pos)) {
-		testNodes.push_back(pos-Vector3(100,0,100));
+		testNodes.push_back(pos);
 	}
 }
 

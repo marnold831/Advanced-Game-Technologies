@@ -3,23 +3,19 @@
 
 using namespace NCL::CSC8503;
 
-GameObject::GameObject(string objectName, uint32_t _layer)	{
-	name			= objectName;
-	layer			= _layer;
-	isActive		= true;
-	boundingVolume	= nullptr;
-	physicsObject	= nullptr;
-	renderObject	= nullptr;
-	networkObject	= nullptr;
-}
 
-
+GameObject::GameObject(string objectName, uint32_t layer): name(objectName), layer(layer), isActive(true), 
+			boundingVolume(nullptr), physicsObject(nullptr), renderObject(nullptr), networkObject(nullptr), stateMachine(nullptr) {}
 
 GameObject::~GameObject()	{
 	delete boundingVolume;
 	delete physicsObject;
 	delete renderObject;
 	delete networkObject;
+}
+
+void NCL::CSC8503::GameObject::Update()
+{
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {

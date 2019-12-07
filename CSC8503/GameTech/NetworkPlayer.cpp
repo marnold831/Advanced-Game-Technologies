@@ -13,6 +13,10 @@ NetworkPlayer::~NetworkPlayer()	{
 
 }
 
+void NCL::CSC8503::NetworkPlayer::Update()
+{
+}
+
 void NetworkPlayer::OnCollisionBegin(GameObject* otherObject) {
 
 }

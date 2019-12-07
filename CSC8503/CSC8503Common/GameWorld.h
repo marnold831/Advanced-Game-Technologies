@@ -31,6 +31,9 @@ namespace NCL {
 				return mainCamera;
 			}
 
+			void SetMode(bool mode) { gameMode = mode; }
+			bool GetInGameMode() const { return gameMode; }
+
 			void ShuffleConstraints(bool state) {
 				shuffleConstraints = state;
 			}
@@ -55,6 +58,7 @@ namespace NCL {
 
 		protected:
 			void UpdateTransforms();
+			void UpdateObjects();
 			void UpdateQuadTree();
 
 			std::vector<GameObject*> gameObjects;
@@ -67,6 +71,7 @@ namespace NCL {
 
 			bool shuffleConstraints;
 			bool shuffleObjects;
+			bool gameMode;
 		};
 	}
 }

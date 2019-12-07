@@ -8,7 +8,7 @@
 using namespace NCL;
 using namespace NCL::CSC8503;
 
-GameWorld::GameWorld()	{
+GameWorld::GameWorld() : gameMode(false)	{
 	mainCamera = new Camera();
 
 	quadTree = nullptr;
@@ -67,11 +67,18 @@ void GameWorld::UpdateWorld(float dt) {
 	if (shuffleConstraints) {
 		std::random_shuffle(constraints.begin(), constraints.end());
 	}
+	if (gameMode)
+		UpdateObjects();
 }
 
 void GameWorld::UpdateTransforms() {
 	for (auto& i : gameObjects) {
 		i->GetTransform().UpdateMatrices();
+	}
+}
+void GameWorld::UpdateObjects() {
+	for (auto& i : gameObjects) {
+		i->Update();
 	}
 }
 

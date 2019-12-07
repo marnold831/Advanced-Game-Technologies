@@ -21,6 +21,9 @@ TutorialGame::TutorialGame()	{
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
+	inGameMode		= false;
+
+	floorSize = Vector3();
 
 	Debug::SetRenderer(renderer);
 
@@ -66,18 +69,24 @@ TutorialGame::~TutorialGame()	{
 	delete physics;
 	delete renderer;
 	delete world;
+	delete gooseController;
 }
 
 void TutorialGame::UpdateGame(float dt) {
 	Vector3 cameraPos = world->GetMainCamera()->GetPosition();
-	string text = "position: (" + std::to_string(cameraPos.x) + "," + std::to_string(cameraPos.y) + "," + std::to_string(cameraPos.z) +")";
+	string text = "position: (" + std::to_string(cameraPos.x) + "," + std::to_string(cameraPos.y) + "," + std::to_string(cameraPos.z) + ")";
 	Debug::Print(text, Vector2(10, 55));
-	if (!inSelectionMode) {
-		world->GetMainCamera()->UpdateCamera(dt);
-	}
-	if (lockedObject != nullptr) {
-		LockedCameraMovement();
-	}
+
+	if (!world->GetInGameMode()) {
+		if (!inSelectionMode) {
+			world->GetMainCamera()->UpdateCamera(dt);
+		}
+		if (lockedObject != nullptr) {
+			LockedCameraMovement();
+		}
+	}	
+	SelectObject();
+	MoveSelectedObject();
 
 	UpdateKeys();
 
@@ -87,10 +96,6 @@ void TutorialGame::UpdateGame(float dt) {
 	else {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
 	}
-
-	SelectObject();
-	MoveSelectedObject();
-
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
@@ -129,6 +134,9 @@ void TutorialGame::UpdateKeys() {
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F8)) {
 		world->ShuffleObjects(false);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F3)) {
+		world->SetMode((world->GetInGameMode()) ? false : true);
 	}
 
 	if (lockedObject) {
@@ -328,7 +336,7 @@ void TutorialGame::InitWorld() {
 	AddGooseToWorld(Vector3(30, 2, 0));
 	//AddAppleToWorld(Vector3(35, 2, 0));
 
-	//AddParkKeeperToWorld(Vector3(40, 2, 0));
+	AddParkKeeperToWorld(Vector3(40, 2, 0));
 	//AddCharacterToWorld(Vector3(45, 2, 0));
 	InitWorldFromFile("TestGrid1.txt");
 	AddFloorToWorld(Vector3(0, -2, 0));
@@ -344,7 +352,8 @@ A single function to add a large immoveable cube to the bottom of our world
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject();
 
-	Vector3 floorSize = Vector3(100, 2, 100);
+	floorSize = Vector3(100, 2, 100);
+
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform().SetWorldScale(floorSize);
@@ -414,8 +423,8 @@ GameObject* TutorialGame::AddGooseToWorld(const Vector3& position)
 	float size			= 1.0f;
 	float inverseMass	= 1.0f;
 
-	GameObject* goose = new GameObject();
-
+	GooseObject* goose = new GooseObject("goose", UINT32_MAX, world);
+	
 
 	SphereVolume* volume = new SphereVolume(size);
 	goose->SetBoundingVolume((CollisionVolume*)volume);
@@ -449,6 +458,7 @@ GameObject* TutorialGame::AddParkKeeperToWorld(const Vector3& position)
 
 	keeper->SetRenderObject(new RenderObject(&keeper->GetTransform(), keeperMesh, nullptr, basicShader));
 	keeper->SetPhysicsObject(new PhysicsObject(&keeper->GetTransform(), keeper->GetBoundingVolume()));
+
 
 	keeper->GetPhysicsObject()->SetInverseMass(inverseMass);
 	keeper->GetPhysicsObject()->InitCubeInertia();
@@ -569,7 +579,7 @@ void NCL::CSC8503::TutorialGame::InitWorldFromFile(const std::string& filename) 
 			infile >> type;
 
 			if (type == 'x') {
-				int cubeDimension = 100 / gridWidth;
+				int cubeDimension = nodeSize / 2;
 				Vector3 position = Vector3((x * gridWidth) /2, 0, (y * gridHeight) /2);
 				ConvertFromNavSpaceToWorldSpace(position);
 				position.y = position.y + 5;

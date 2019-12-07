@@ -1,6 +1,7 @@
 #pragma once
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
+#include "..\\CSC8503Common\GooseController.h"
 
 
 namespace NCL {
@@ -51,11 +52,15 @@ namespace NCL {
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+			GooseObject* gooseController;
 
 			bool useGravity;
 			bool inSelectionMode;
+			bool inGameMode;
 
 			float		forceMagnitude;
+
+			Vector3 floorSize;
 
 			GameObject* selectionObject = nullptr;
 

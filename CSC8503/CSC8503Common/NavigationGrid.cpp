@@ -19,9 +19,11 @@ NavigationGrid::NavigationGrid()	{
 	gridWidth	= 0;
 	gridHeight	= 0;
 	allNodes	= nullptr;
+	offSet      = 0.0f;
 }
 
-NavigationGrid::NavigationGrid(const std::string&filename) : NavigationGrid() {
+NavigationGrid::NavigationGrid(const std::string&filename, float offset) : NavigationGrid() {
+	this->offSet = offset;
 	std::ifstream infile(Assets::DATADIR + filename);
 
 	infile >> nodeSize;
@@ -29,6 +31,7 @@ NavigationGrid::NavigationGrid(const std::string&filename) : NavigationGrid() {
 	infile >> gridHeight;
 
 	allNodes = new GridNode[gridWidth * gridHeight];
+	float dimension = nodeSize / 2;
 
 	for (int y = 0; y < gridHeight; ++y) {
 		for (int x = 0; x < gridWidth; ++x) {
@@ -36,7 +39,7 @@ NavigationGrid::NavigationGrid(const std::string&filename) : NavigationGrid() {
 			char type = 0;
 			infile >> type;
 			n.type = type;
-			n.position = Vector3((float)(x * gridWidth), 0, (float)(y * gridHeight));
+			n.position = Vector3((float)(x * nodeSize) - offSet + dimension, 0, (float)(y * nodeSize) - offSet + dimension);
 		}
 	}
 	
@@ -77,11 +80,11 @@ NavigationGrid::~NavigationGrid()	{
 
 bool NavigationGrid::FindPath(const Vector3& from, const Vector3& to, NavigationPath& outPath) {
 	
-	int fromX = (from.x / nodeSize);
-	int fromZ = (from.z / nodeSize);
+	int fromX = ((from.x + offSet) / nodeSize);
+	int fromZ = ((from.z + offSet) / nodeSize);
 
-	int toX = (to.x / nodeSize);
-	int toZ = (to.z / nodeSize);
+	int toX = ((to.x + offSet) / nodeSize);
+	int toZ = ((to.z + offSet) / nodeSize);
 
 	if (fromX < 0 || fromX > gridWidth - 1 || fromZ < 0 || fromZ > gridHeight - 1)
 		return false;
