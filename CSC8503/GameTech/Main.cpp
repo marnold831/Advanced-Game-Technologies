@@ -16,38 +16,66 @@ using namespace NCL;
 using namespace CSC8503;
 
 void TestStateMachine() {
+	
 }
 
+class TestPacketReceiver : public PacketReceiver {
+public:
+
+	TestPacketReceiver(string name) {
+		this->name = name;
+	}
+
+	void ReceivePacket(int type, GamePacket* payload, int source) {
+		if (type == String_Message) {
+			StringPacket* realPacket = (StringPacket*)payload;
+			string msg = realPacket->GetStringFromData();
+			std::cout << "recieved message: " << msg << std::endl;
+		}
+	}
+protected:
+	string name;
+
+};
+
 void TestNetworking() {
+	NetworkBase::Initialise();
+
+	TestPacketReceiver serverReciever("Server");
+	TestPacketReceiver clientReciever("client");
+
+	int port = NetworkBase::GetDefaultPort();
+
+	GameServer* server = new GameServer(port, 1);
+	GameClient* client = new GameClient();
+
+	server->RegisterPacketHandler(String_Message, &serverReciever);
+	client->RegisterPacketHandler(String_Message, &clientReciever);
+
+	bool canConnect = client->Connect(127, 0, 0, 1, port);
+
+	for (int i = 0; i < 100; ++i) {
+		server->SendGlobalPacket(StringPacket("server says hello! and Alex can't code" + std::to_string(i)));
+
+		client->SendPacket(StringPacket("client says hello" + std::to_string(i)));
+
+		server->UpdateServer();
+		client->UpdateClient();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	NetworkBase::Destroy();
 }
 
 vector<Vector3> testNodes;
 
 void TestPathfinding() {
-	NavigationGrid grid("TestGrid1.txt", 100.0f);
 
-	NavigationPath outPath;
-
-	Vector3 startPos(-70, 0, -70);
-	Vector3 endPos(60, 0, 60); // now real world positions
-	grid.SetOffset(100.0f); //half the floors width. the floor stems from -100 to 100
-
-	bool found = grid.FindPath(startPos, endPos, outPath);
-
-	Vector3 pos;
-	while (outPath.PopWaypoint(pos)) {
-		testNodes.push_back(pos);
-	}
 }
 
 void DisplayPathfinding() {
 
-	for (int i = 1; i < testNodes.size(); ++i) {
-		Vector3 a = testNodes[i - 1];
-		Vector3 b = testNodes[i];
 
-		Debug::DrawLine(a, b, Vector4(1, 0.55, 0, 1));
-	}
 }
 
 
@@ -79,7 +107,7 @@ int main() {
 	w->LockMouseToWindow(true);
 
 	TutorialGame* g = new TutorialGame();
-
+	
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
 		float dt = w->GetTimer()->GetTimeDeltaSeconds();
 
@@ -98,7 +126,11 @@ int main() {
 
 		w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
 
-		g->UpdateGame(dt);
+		if (!g->UpdateGame(dt))
+			return (0);
 	}
+
+
+	
 	Window::DestroyGameWindow();
 }

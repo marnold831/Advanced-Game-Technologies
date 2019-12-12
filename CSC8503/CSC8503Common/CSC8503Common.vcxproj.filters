@@ -126,6 +126,18 @@
     <ClInclude Include="GooseObject.h">
       <Filter>Other</Filter>
     </ClInclude>
+    <ClInclude Include="KeeperObject.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Layers.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterObject.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="HighscorePacketReceiver.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CollisionDetection.cpp">
@@ -205,6 +217,15 @@
     </ClCompile>
     <ClCompile Include="GooseObject.cpp">
       <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="KeeperObject.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterObject.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="HighscorePacketReceiver.cpp">
+      <Filter>Networking</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

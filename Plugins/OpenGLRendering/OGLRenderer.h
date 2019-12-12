@@ -54,7 +54,7 @@ namespace NCL {
 
 			virtual bool SetVerticalSync(VerticalSyncState s);
 
-			void DrawString(const std::string& text, const Vector2&pos, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f,1));
+			void DrawString(const std::string& text, const Vector2&pos, float size, const Vector4& colour = Vector4(0.75f, 0.75f, 0.75f, 1));
 			void DrawLine(const Vector3& start, const Vector3& end, const Vector4& colour);
 
 			virtual void SetupDebugMatrix(OGLShader*s) {

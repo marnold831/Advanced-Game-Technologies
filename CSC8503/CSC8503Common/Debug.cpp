@@ -33,7 +33,7 @@ void Debug::FlushRenderables() {
 		return;
 	}
 	for (const auto& i : stringEntries) {
-		renderer->DrawString(i.data, i.position);
+		renderer->DrawString(i.data, i.position, 0.5f);
 	}
 
 	for (const auto& i : lineEntries) {

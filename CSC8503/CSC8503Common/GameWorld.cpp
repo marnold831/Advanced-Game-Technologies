@@ -8,13 +8,8 @@
 using namespace NCL;
 using namespace NCL::CSC8503;
 
-GameWorld::GameWorld() : gameMode(false)	{
+GameWorld::GameWorld() : quadTree(nullptr), shuffleConstraints(false), shuffleObjects(false), gameMode(false){
 	mainCamera = new Camera();
-
-	quadTree = nullptr;
-
-	shuffleConstraints	= false;
-	shuffleObjects		= false;
 }
 
 GameWorld::~GameWorld()	{
@@ -57,8 +52,17 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 	}
 }
 
+void GameWorld::DeleteObject(GameObject* object) {
+	for (int i = 0; i < gameObjects.size(); ++i) {
+		if (gameObjects[i] == object)
+			gameObjects.erase(gameObjects.begin() + i);
+	}
+}
+
 void GameWorld::UpdateWorld(float dt) {
 	UpdateTransforms();
+	if(gameMode)
+		UpdateObjects(dt);
 
 	if (shuffleObjects) {
 		std::random_shuffle(gameObjects.begin(), gameObjects.end());
@@ -67,18 +71,18 @@ void GameWorld::UpdateWorld(float dt) {
 	if (shuffleConstraints) {
 		std::random_shuffle(constraints.begin(), constraints.end());
 	}
-	if (gameMode)
-		UpdateObjects();
 }
 
 void GameWorld::UpdateTransforms() {
 	for (auto& i : gameObjects) {
 		i->GetTransform().UpdateMatrices();
+		i->SetDebug(debugMode);
 	}
 }
-void GameWorld::UpdateObjects() {
+
+void GameWorld::UpdateObjects(float dt) {
 	for (auto& i : gameObjects) {
-		i->Update();
+		i->Update(dt);
 	}
 }
 

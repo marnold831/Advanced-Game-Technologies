@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Common/Vector3.h"
+#include "..\\..\\Common\Vector2.h"
 #include "../../Common/Matrix3.h"
 
 using namespace NCL::Maths;

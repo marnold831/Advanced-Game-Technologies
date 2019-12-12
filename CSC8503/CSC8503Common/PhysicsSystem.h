@@ -22,6 +22,8 @@ namespace NCL {
 			}
 
 			void SetGravity(const Vector3& g);
+
+			void DeleteObject(GameObject* object);
 		protected:
 			void BasicCollisionDetection();
 			void BroadPhase();

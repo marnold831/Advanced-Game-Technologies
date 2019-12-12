@@ -27,6 +27,8 @@ namespace NCL {
 			camType		= CameraType::Perspective;
 
 			speed = 50.0f;
+
+			disableControls = false;
 		};
 
 		Camera(float pitch, float yaw, const Vector3& position) : Camera() {
@@ -64,6 +66,9 @@ namespace NCL {
 		void SetFarPlane(float val) {
 			farPlane = val;
 		}
+
+		void SetToggleControls(bool controls) { disableControls = controls; }
+		bool GetToggleControls() const { return disableControls; }
 
 		//Builds a view matrix for the current camera variables, suitable for sending straight
 		//to a vertex shader (i.e it's already an 'inverse camera matrix').
@@ -103,5 +108,7 @@ namespace NCL {
 		float	yaw;
 		float	pitch;
 		Vector3 position;
+
+		bool disableControls;
 	};
 }

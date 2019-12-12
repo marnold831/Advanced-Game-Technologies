@@ -1,7 +1,6 @@
 #pragma once
 #include "Transform.h"
 #include "CollisionVolume.h"
-#include "StateMachine.h"
 
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -20,7 +19,7 @@ namespace NCL {
 			GameObject(string name = "", uint32_t layer = UINT32_MAX);
 			virtual ~GameObject();
 
-			virtual void Update();
+			virtual void Update(float dt);
 
 			void SetBoundingVolume(CollisionVolume* vol) {
 				boundingVolume = vol;
@@ -54,10 +53,6 @@ namespace NCL {
 				return networkObject;
 			}
 
-			StateMachine* GetSateMachine() const {
-				return stateMachine;
-			}
-
 			void SetRenderObject(RenderObject* newObject) {
 				renderObject = newObject;
 			}
@@ -65,17 +60,18 @@ namespace NCL {
 			void SetPhysicsObject(PhysicsObject* newObject) {
 				physicsObject = newObject;
 			}
-			void SetStateMachine(StateMachine* machine) {
-				stateMachine = machine;
-			}
 
 			const string& GetName() const {
 				return name;
 			}
 
-			const uint32_t GetLayer() const {
+			uint32_t GetLayer() const {
 				return layer;
 			}
+
+			void SetDebug(bool mode) { debugInfo = mode; }
+
+			void SetLayer(uint32_t _layer) { layer = _layer; }
 
 			virtual void OnCollisionBegin(GameObject* otherObject) {
 				//std::cout << "OnCollisionBegin event occured!\n";
@@ -96,9 +92,9 @@ namespace NCL {
 			PhysicsObject*		physicsObject;
 			RenderObject*		renderObject;
 			NetworkObject*		networkObject;
-			StateMachine*       stateMachine;
 
 			bool	isActive;
+			bool	debugInfo;
 			string	name;
 			uint32_t layer;
 

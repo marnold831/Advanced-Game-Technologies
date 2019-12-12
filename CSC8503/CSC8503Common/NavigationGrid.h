@@ -29,19 +29,19 @@ namespace NCL {
 			~GridNode() {	}
 		};
 
-		class NavigationGrid : public NavigationMap	{
+		class NavigationGrid : public NavigationMap {
 		public:
 			NavigationGrid();
-			NavigationGrid(const std::string&filename, float offset);
+			NavigationGrid(const std::string& filename, float offset);
 			~NavigationGrid();
 
 			bool FindPath(const Vector3& from, const Vector3& to, NavigationPath& outPath) override;
 
 			void SetOffset(float _offSet) { offSet = _offSet; }
-				
+
 		protected:
 			bool		NodeInList(GridNode* n, std::vector<GridNode*>& list) const;
-			GridNode*	RemoveBestNode(std::vector<GridNode*>& list) const;
+			GridNode* RemoveBestNode(std::vector<GridNode*>& list) const;
 			float		Heuristic(GridNode* hNode, GridNode* endNode) const;
 			int nodeSize;
 			int gridWidth;
@@ -52,4 +52,3 @@ namespace NCL {
 		};
 	}
 }
-

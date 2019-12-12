@@ -31,9 +31,6 @@ namespace NCL {
 				return mainCamera;
 			}
 
-			void SetMode(bool mode) { gameMode = mode; }
-			bool GetInGameMode() const { return gameMode; }
-
 			void ShuffleConstraints(bool state) {
 				shuffleConstraints = state;
 			}
@@ -42,11 +39,17 @@ namespace NCL {
 				shuffleObjects = state;
 			}
 
+			bool GetinGameMode() const { return gameMode; }
+			void SetinGameMode(bool mode) { gameMode = mode; }
+			void SetDebugMode(bool mode) { debugMode = mode; }
+
 			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject = false) const;
 
 			virtual void UpdateWorld(float dt);
 
 			void OperateOnContents(GameObjectFunc f);
+
+			void DeleteObject(GameObject* object);
 
 			void GetObjectIterators(
 				GameObjectIterator& first,
@@ -58,7 +61,7 @@ namespace NCL {
 
 		protected:
 			void UpdateTransforms();
-			void UpdateObjects();
+			void UpdateObjects(float dt);
 			void UpdateQuadTree();
 
 			std::vector<GameObject*> gameObjects;
@@ -72,6 +75,7 @@ namespace NCL {
 			bool shuffleConstraints;
 			bool shuffleObjects;
 			bool gameMode;
+			bool debugMode;
 		};
 	}
 }

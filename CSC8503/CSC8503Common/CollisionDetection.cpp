@@ -10,7 +10,7 @@
 #include <list>
 
 #include "../CSC8503Common/Simplex.h"
-
+#include "Layers.h"
 #include "Debug.h"
 
 using namespace NCL;
@@ -122,8 +122,19 @@ bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, Collis
 	const CollisionVolume* volA = a->GetBoundingVolume();
 	const CollisionVolume* volB = b->GetBoundingVolume();
 
+
+
 	if (!volA || !volB)
 		return false;
+
+	
+	if (a->GetLayer() & DISABLE_COLLISION_RES_LAYER && b->GetLayer() & DISABLE_COLLISION_RES_LAYER) {  //disabling collision detection
+		return false;
+	}
+	if (a->GetLayer() & DISABLE_OBJECT_OBJECT_COL_LAYER && b->GetLayer() & DISABLE_OBJECT_OBJECT_COL_LAYER) { //disabling collision detection between 2 objects but not the world
+		return false;
+	}
+	
 
 	collisionInfo.a = a;
 	collisionInfo.b = b;

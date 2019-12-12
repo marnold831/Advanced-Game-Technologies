@@ -1,0 +1,10 @@
+nameA 3
+nameB 2
+QBc8W 1
+QBc8W 1
+QBc8W 0
+QBc8W 0
+QBc8W 0
+QBc8W 0
+QBc8W 0
+QBc8W 0

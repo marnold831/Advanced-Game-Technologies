@@ -27,6 +27,16 @@ void PhysicsSystem::SetGravity(const Vector3& g) {
 	gravity = g;
 }
 
+void NCL::CSC8503::PhysicsSystem::DeleteObject(GameObject* object) {
+	for (auto i : allCollisions) {
+		if (i.a == object || i.b == object) {
+			i.a = nullptr;
+			i.b = nullptr;
+		}
+	}
+	
+}
+
 /*
 
 If the 'game' is ever reset, the PhysicsSystem must be
@@ -129,8 +139,12 @@ void PhysicsSystem::UpdateCollisionList() {
 		}
 		(*i).framesLeft = (*i).framesLeft - 1;
 		if ((*i).framesLeft < 0) {
-			i->a->OnCollisionEnd(i->b);
-			i->b->OnCollisionEnd(i->a);
+			if (i->a != nullptr) {
+				i->a->OnCollisionEnd(i->b);
+			}
+			if (i->b != nullptr) {
+				i->b->OnCollisionEnd(i->a);
+			}	
 			i = allCollisions.erase(i);
 		}
 		else {

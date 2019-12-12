@@ -10,7 +10,7 @@ https://research.ncl.ac.uk/game/
 #include <string>
 #include <vector>
 #include "TextureBase.h"
-
+#include "Vector2.h"
 namespace NCL {
 	namespace Maths {
 		class Vector2;
@@ -24,7 +24,9 @@ namespace NCL {
 			SimpleFont(const std::string&fontName, const std::string&texName);
 			~SimpleFont();
 
-			int BuildVerticesForString(std::string &text, Maths::Vector2&startPos, Maths::Vector4&colour, std::vector<Maths::Vector3>&positions, std::vector<Maths::Vector2>&texCoords, std::vector<Maths::Vector4>&colours);
+			int BuildVerticesForString(std::string& text, NCL::Maths::Vector2& startPos, NCL::Maths::Vector4& colour, std::vector<NCL::Maths::Vector3>& positions, std::vector<NCL::Maths::Vector2>& texCoords, std::vector<NCL::Maths::Vector4>& colours, float scale);
+
+		
 
 			const TextureBase* GetTexture() const {
 				return texture;

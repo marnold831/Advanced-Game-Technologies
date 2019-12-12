@@ -9,22 +9,24 @@ namespace NCL {
 			virtual void Update() = 0; //Pure virtual base class
 		};
 
-		typedef void(*StateFunc)(void*);
+		typedef void(*StateFunc)(void*, void*);
 
 		class GenericState : public State		{
 		public:
-			GenericState(StateFunc someFunc, void* someData) {
+			GenericState(StateFunc someFunc, void* objectA, void* objectB) {
 				func		= someFunc;
-				funcData	= someData;
+				funcObjectAData = objectA;
+				funcObjectBData = objectB;
 			}
 			virtual void Update() {
-				if (funcData != nullptr) {
-					func(funcData);
+				if (funcObjectAData != nullptr && funcObjectBData != nullptr) {
+					func(funcObjectAData, funcObjectBData);
 				}
 			}
 		protected:
 			StateFunc func;
-			void* funcData;
+			void* funcObjectAData;
+			void* funcObjectBData;
 		};
 	}
 }
