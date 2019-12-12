@@ -2,6 +2,7 @@
 #include "StateTransition.h"
 #include "State.h"
 #include "Debug.h"
+#include "..//..//Common/Maths.h"
 
 
 using namespace NCL;
@@ -67,7 +68,7 @@ KeeperObject::KeeperObject(string name, uint32_t layer, GooseObject* goose) : Ga
 		Vector3 goosePos = GooseData->GetTransform().GetWorldPosition();
 
 		if ((keeperPos - goosePos).Length() < 30.0f) {
-			std::cout << "Transition A triggered" << std::endl;
+			keeperData->GetNavigationPath()->Clear();
 			return true;
 		}
 		return false;
@@ -81,14 +82,15 @@ KeeperObject::KeeperObject(string name, uint32_t layer, GooseObject* goose) : Ga
 		
 
 		if ((keeperPos - goosePos).Length() > 40.0f) {
+			keeperData->GetNavigationPath()->Clear();
 			return true;
-			std::cout << "Transition B triggered" << std::endl;
+			
 		}
 
 		return false;
 	};
 	
-	GenericTransition<void*, void*>* transitionA = new GenericTransition<void*, void*>(transitionAFunc, goose, this, stateB, stateA);
+	GenericTransition<void*, void*>* transitionA = new GenericTransition<void*, void*>(transitionAFunc, this, goose, stateB, stateA);
 	GenericTransition<void*, void*>* transitionB = new GenericTransition<void*, void*>(transitionBFunc, this, goose, stateA, stateB);
 
 	stateMachine->AddTransition(transitionA);
@@ -121,6 +123,8 @@ void KeeperObject::UpdatePosition() {
 	Vector3 direction = (targetPos - currentPos).Normalised();
 	direction.y = 0;
 	GetPhysicsObject()->AddForce(direction * 100);
+
+	GetTransform().SetLocalOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0.0f, 1.0f, 0.0f), RadiansToDegrees(atan2(direction.x, direction.z))));
 
 	if (debugInfo) {
 		Debug::DrawLine(currentPos, targetPos, Vector4(1, 0.55, 0, 1));

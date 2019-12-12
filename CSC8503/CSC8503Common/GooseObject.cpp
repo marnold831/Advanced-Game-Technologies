@@ -12,7 +12,8 @@
 using namespace NCL;
 using namespace CSC8503;
 
-GooseObject::GooseObject(string name, uint32_t layer) : GameObject(name, layer), camera(nullptr), holdingObject(nullptr), game(nullptr), scaredMode(false), isHoldingBonus(false), caught(false), timer(0.0), generatedScaredPath(false){
+GooseObject::GooseObject(string name, uint32_t layer) : GameObject(name, layer), camera(nullptr), holdingObject(nullptr), game(nullptr), scaredMode(false), isHoldingBonus(false),
+caught(false), timer(0.0), generatedScaredPath(false), collisionWater(false){
 	grid = new NavigationGrid("TestGrid1.txt", 100.0f);
 	path = new NavigationPath();
 }
@@ -94,9 +95,20 @@ void NCL::CSC8503::GooseObject::OnCollisionBegin(GameObject* otherObject) {
 		if (otherObject->GetName() == "bonus")
 			isHoldingBonus = true;
 	}
+	if (otherObject->GetName() == "water") {
+		collisionWater = true;
+	}
+	
 	
 		
 	
+}
+
+void NCL::CSC8503::GooseObject::OnCollisionEnd(GameObject* otherObject)
+{
+	if (otherObject->GetName() == "water") {
+		collisionWater = false;
+	}
 }
 
 void GooseObject::MouseListener() {
@@ -129,22 +141,26 @@ void GooseObject::KeyboardListener(){
 	Vector3 relativePos = currentFramePos - camera->GetPosition();
 	GetTransform().SetLocalOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0.0f, 1.0f, 0.0f), RadiansToDegrees(atan2(relativePos.x, relativePos.z))));
 
+	float forceWater = 2.0f;
+	float force = 10.0f;
+	if (collisionWater)
+		force = forceWater;
 
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT) || Window::GetKeyboard()->KeyDown(KeyboardKeys::A)) {
-		GetPhysicsObject()->AddForce(-rightAxis * 30.0f);
+		GetPhysicsObject()->AddForce(-rightAxis * force * 3.0f);
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT) || Window::GetKeyboard()->KeyDown(KeyboardKeys::D)) {
-		GetPhysicsObject()->AddForce(rightAxis * 30.0f);
+		GetPhysicsObject()->AddForce(rightAxis * force * 3.0f);
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP) || Window::GetKeyboard()->KeyDown(KeyboardKeys::W)) {
-		GetPhysicsObject()->AddForce(fwdAxis * 10.0f);
+		GetPhysicsObject()->AddForce(fwdAxis * force);
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN) || Window::GetKeyboard()->KeyDown(KeyboardKeys::S)) {
-		GetPhysicsObject()->AddForce(-fwdAxis * 10.0f);
+		GetPhysicsObject()->AddForce(-fwdAxis * force);
 	}
 	
 }

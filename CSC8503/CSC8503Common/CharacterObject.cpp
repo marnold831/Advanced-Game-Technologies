@@ -1,5 +1,6 @@
 #include "CharacterObject.h"
 #include "Debug.h"
+#include "..//..//Common/Maths.h"
 
 
 using namespace NCL;
@@ -55,7 +56,7 @@ void NCL::CSC8503::CharacterObject::TestToChaseGoose() {
 
 void CharacterObject::BuildPathToGoose() {
 	bool found = false;
-
+	path->Clear();
 	while (!found) {
 		Vector3 targetLocation = goose->GetTransform().GetWorldPosition();
 		found = grid->FindPath(GetTransform().GetWorldPosition(), targetLocation, *path);
@@ -81,9 +82,9 @@ void CharacterObject::UpdatePosition() {
 	direction.y = 0;
 	GetPhysicsObject()->AddForce(direction * 100);
 
-	/*Debug::DrawLine(currentPos, targetPos, Vector4(1, 0.55, 0, 1));
-	Debug::DrawLine(currentPos, currentPos + Vector3(0, 40, 0), Vector4(1, 0, 0, 1));
-	Debug::DrawLine(targetPos, targetPos + Vector3(0, 40, 0), Vector4(1, 1, 0, 1));*/
+	GetTransform().SetLocalOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0.0f, 1.0f, 0.0f), RadiansToDegrees(atan2(direction.x, direction.z))));
+
+
 	if(debugInfo)
 		path->DrawLines();
 }

@@ -801,6 +801,8 @@ bool TutorialGame::ButtonAAction() {
 			world->GetMainCamera()->SetToggleControls(true);
 			SetCameraBehindGoose();
 			success = true;
+			useGravity = true;
+			physics->UseGravity(useGravity);
 		}
 		else
 		{
@@ -951,9 +953,6 @@ void TutorialGame::InitWorldFromFile(const std::string& filename) {
 }
 
 
-
-
-
 void TutorialGame::InitMainMenu() {
 	menuObjects.push_back(AddCubeToWorld(Vector3(-6, 27, 0), Vector3(5, 3, 0), startButtonTex, 0.0f, "buttonA", MENU_LAYER));
 	menuObjects.push_back(AddCubeToWorld(Vector3(6, 27, 0), Vector3(5, 3, 0), highscoresButtonTex, 0.0f, "buttonB", MENU_LAYER));
@@ -1007,7 +1006,6 @@ void TutorialGame::SetCameraBehindGoose() {
 	Quaternion orientationGoose = goose->GetTransform().GetWorldOrientation();
 	Vector3 frwdAxis(0, 0, 1);
 	frwdAxis = orientationGoose * frwdAxis;
-	//frwdAxis.y -= 0.5f;
 	world->GetMainCamera()->SetPosition(goose->GetTransform().GetWorldPosition() - (frwdAxis * 25));
 	Vector3 camPos = world->GetMainCamera()->GetPosition();
 	camPos.y += 10.0f;

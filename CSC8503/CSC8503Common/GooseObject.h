@@ -18,6 +18,7 @@ namespace NCL {
 
 			void SetCamera(Camera* _camera) { camera = _camera; }
 			void OnCollisionBegin(GameObject* otherObject) override;
+			void OnCollisionEnd(GameObject* otherObject) override;
 
 			void SetHomeBoundary(Vector2 boundary) { homeBoundary = boundary; }
 
@@ -61,6 +62,7 @@ namespace NCL {
 			bool isHoldingBonus;
 			bool caught;
 			bool generatedScaredPath;
+			bool collisionWater;
 			float timer;
 		};
 	}

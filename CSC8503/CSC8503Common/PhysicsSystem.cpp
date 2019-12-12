@@ -189,6 +189,12 @@ void PhysicsSystem::BasicCollisionDetection() {
 			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
 				ImpulseResolveCollision(*info.a, *info.b, info.point);
 				info.framesLeft = numCollisionFrames;
+
+				auto it = allCollisions.find(info);
+				if (it != allCollisions.end()) {
+					(*it).framesLeft = numCollisionFrames;
+				}
+
 				allCollisions.insert(info);
 			}
 		}
