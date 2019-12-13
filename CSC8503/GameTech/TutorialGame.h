@@ -73,6 +73,8 @@ namespace NCL {
 			GameObject* AddCharacterToWorld(const Vector3& position, GooseObject* goose);
 			GameObject* AddAppleToWorld(const Vector3& position);
 
+			void AddOOBBToWorld();
+
 			void AddTreeToWorld(const Vector3& position);
 
 

@@ -66,9 +66,6 @@
     <ClInclude Include="SphereVolume.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
-    <ClInclude Include="OBBVolume.h">
-      <Filter>CollisionDetection</Filter>
-    </ClInclude>
     <ClInclude Include="AABBVolume.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
@@ -137,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="HighscorePacketReceiver.h">
       <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="OOBBVolume.h">
+      <Filter>CollisionDetection</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

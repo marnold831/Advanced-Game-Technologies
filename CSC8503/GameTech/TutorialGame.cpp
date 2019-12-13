@@ -65,6 +65,7 @@ void TutorialGame::InitialiseAssets() {
 
 	InitCamera();
 	InitWorld();
+	AddOOBBToWorld();
 	InitServer();
 }
 
@@ -100,6 +101,7 @@ bool TutorialGame::UpdateGame(float dt) {
 	}
 	else if(debugInfo) {
 		Debug::Print("(G)ravity off", Vector2(10, 40));
+		MoveSelectedObject();
 	}
 	if (SelectObject()) {
 		string objectName = selectionObject->GetName();
@@ -521,6 +523,7 @@ void TutorialGame::MoveSelectedObject() {
 
 	if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
 		Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+		
 
 		RayCollision closestCollision;
 		if (world->Raycast(ray, closestCollision, true)) {
@@ -788,6 +791,40 @@ GameObject* TutorialGame::AddAppleToWorld(const Vector3& position) {
 	return apple;
 }
 
+void NCL::CSC8503::TutorialGame::AddOOBBToWorld() {
+	GameObject* OOBBA = new GameObject("OOBBA", CLICKABLE_LAYER);
+
+	OOBBVolume* volume = new OOBBVolume(Vector3(2.5,2.5,2.5));
+
+	OOBBA->SetBoundingVolume((CollisionVolume*)volume);
+	OOBBA->GetTransform().SetWorldPosition(Vector3(-70,10,40));
+	OOBBA->GetTransform().SetWorldScale(Vector3(2.5,2.5,2.5));
+	OOBBA->SetRenderObject(new RenderObject(&OOBBA->GetTransform(), cubeMesh, basicTex, basicShader));
+
+	OOBBA->SetPhysicsObject(new PhysicsObject(&OOBBA->GetTransform(), OOBBA->GetBoundingVolume()));
+
+	OOBBA->GetPhysicsObject()->SetInverseMass(1.0f);
+	OOBBA->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(OOBBA);
+
+	GameObject* OOBBB = new GameObject("OOBBB", CLICKABLE_LAYER);
+
+	OOBBVolume* volumeB = new OOBBVolume(Vector3(2.5, 2.5, 2.5));
+
+	OOBBB->SetBoundingVolume((CollisionVolume*)volumeB);
+	OOBBB->GetTransform().SetWorldPosition(Vector3(-60, 10, 40));
+	OOBBB->GetTransform().SetWorldScale(Vector3(2.5, 2.5, 2.5));
+	OOBBB->SetRenderObject(new RenderObject(&OOBBB->GetTransform(), cubeMesh, basicTex, basicShader));
+
+	OOBBB->SetPhysicsObject(new PhysicsObject(&OOBBB->GetTransform(), OOBBB->GetBoundingVolume()));
+
+	OOBBB->GetPhysicsObject()->SetInverseMass(1.0f);
+	OOBBB->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(OOBBB);
+}
+
 bool TutorialGame::ButtonAAction() {
 	bool success = false;
 	for (auto i : menuObjects) {
@@ -997,8 +1034,8 @@ void TutorialGame::SimpleGJKTest() {
 	delete fallingCube->GetBoundingVolume();
 	delete newFloor->GetBoundingVolume();
 
-	fallingCube->SetBoundingVolume((CollisionVolume*)new OBBVolume(dimensions));
-	newFloor->SetBoundingVolume((CollisionVolume*)new OBBVolume(floorDimensions));
+	fallingCube->SetBoundingVolume((CollisionVolume*)new OOBBVolume(dimensions));
+	newFloor->SetBoundingVolume((CollisionVolume*)new OOBBVolume(floorDimensions));
 
 }
 

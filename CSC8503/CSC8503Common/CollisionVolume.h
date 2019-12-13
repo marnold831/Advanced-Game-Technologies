@@ -2,7 +2,7 @@
 namespace NCL {
 	enum class VolumeType {
 		AABB	= 1,
-		OBB		= 2,
+		OOBB	= 2,
 		Sphere	= 4, 
 		Mesh	= 8,
 		Compound= 16,

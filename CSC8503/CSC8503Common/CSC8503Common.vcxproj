@@ -148,7 +148,7 @@
     <ClInclude Include="NavigationPath.h" />
     <ClInclude Include="NetworkObject.h" />
     <ClInclude Include="NetworkState.h" />
-    <ClInclude Include="OBBVolume.h" />
+    <ClInclude Include="OOBBVolume.h" />
     <ClInclude Include="SphereVolume.h" />
     <ClInclude Include="CollisionVolume.h" />
     <ClInclude Include="CollisionDetection.h" />
