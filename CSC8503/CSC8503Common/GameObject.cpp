@@ -4,22 +4,22 @@
 using namespace NCL::CSC8503;
 
 GameObject::GameObject(string objectName, uint32_t _layer)	{
-	name			= objectName;
-	layer			= _layer;
-	isActive		= true;
-	boundingVolume	= nullptr;
-	physicsObject	= nullptr;
-	renderObject	= nullptr;
-	networkObject	= nullptr;
+	m_Name				= objectName;
+	m_Layer				= _layer;
+	m_IsActive			= true;
+	m_BoundingVolume	= nullptr;
+	m_PhysicsObject		= nullptr;
+	m_RenderObject		= nullptr;
+	m_NetworkObject		= nullptr;
 }
 
 
 
 GameObject::~GameObject()	{
-	delete boundingVolume;
-	delete physicsObject;
-	delete renderObject;
-	delete networkObject;
+	delete m_BoundingVolume;
+	delete m_PhysicsObject;
+	delete m_RenderObject;
+	delete m_NetworkObject;
 }
 
 void GameObject::Update(float dt){
@@ -27,29 +27,29 @@ void GameObject::Update(float dt){
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
-	if (!boundingVolume) {
+	if (!m_BoundingVolume) {
 		return false;
 	}
-	outSize = broadphaseAABB;
+	outSize = m_BroadphaseAABB;
 	return true;
 }
 
 //These would be better as a virtual 'ToAABB' type function, really...
 void GameObject::UpdateBroadphaseAABB() {
-	if (!boundingVolume) {
+	if (!m_BoundingVolume) {
 		return;
 	}
-	if (boundingVolume->type == VolumeType::AABB) {
-		broadphaseAABB = ((AABBVolume&)*boundingVolume).GetHalfDimensions();
+	if (m_BoundingVolume->type == VolumeType::AABB) {
+		m_BroadphaseAABB = ((AABBVolume&)*m_BoundingVolume).GetHalfDimensions();
 	}
-	else if (boundingVolume->type == VolumeType::Sphere) {
-		float r = ((SphereVolume&)*boundingVolume).GetRadius();
-		broadphaseAABB = Vector3(r, r, r);
+	else if (m_BoundingVolume->type == VolumeType::Sphere) {
+		float r = ((SphereVolume&)*m_BoundingVolume).GetRadius();
+		m_BroadphaseAABB = Vector3(r, r, r);
 	}
-	else if (boundingVolume->type == VolumeType::OOBB) {
-		Matrix3 mat = Matrix3(transform.GetWorldOrientation());
+	else if (m_BoundingVolume->type == VolumeType::OOBB) {
+		Matrix3 mat = Matrix3(m_Transform.GetWorldOrientation());
 		mat = mat.Absolute();
-		Vector3 halfSizes = ((OOBBVolume&)*boundingVolume).GetHalfDimensions();
-		broadphaseAABB = mat * halfSizes;
+		Vector3 halfSizes = ((OOBBVolume&)*m_BoundingVolume).GetHalfDimensions();
+		m_BroadphaseAABB = mat * halfSizes;
 	}
 }

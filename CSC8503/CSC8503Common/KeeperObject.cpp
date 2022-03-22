@@ -126,7 +126,7 @@ void KeeperObject::UpdatePosition() {
 
 	GetTransform().SetLocalOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0.0f, 1.0f, 0.0f), RadiansToDegrees(atan2(direction.x, direction.z))));
 
-	if (debugInfo) {
+	if (m_DebugInfo) {
 		Debug::DrawLine(currentPos, targetPos, Vector4(1, 0.55, 0, 1));
 		Debug::DrawLine(currentPos, currentPos + Vector3(0, 40, 0), Vector4(1, 0, 0, 1));
 		Debug::DrawLine(targetPos, targetPos + Vector3(0, 40, 0), Vector4(1, 1, 0, 1));

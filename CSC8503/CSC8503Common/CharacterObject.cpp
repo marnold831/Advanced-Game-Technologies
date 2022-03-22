@@ -85,7 +85,7 @@ void CharacterObject::UpdatePosition() {
 	GetTransform().SetLocalOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0.0f, 1.0f, 0.0f), RadiansToDegrees(atan2(direction.x, direction.z))));
 
 
-	if(debugInfo)
+	if(m_DebugInfo)
 		path->DrawLines();
 }
 

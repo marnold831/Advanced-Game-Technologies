@@ -33,7 +33,7 @@ void GooseObject::Update(float dt) {
 		if (!generatedScaredPath) {
 			Scared();
 
-			this->SetLayer(layer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
+			this->SetLayer(m_Layer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
 			uint32_t tempLayer = holdingObject->GetLayer();
 			holdingObject->SetLayer(tempLayer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
 			holdingObject->GetTransform().SetWorldPosition(holdingObject->GetTransform().GetWorldPosition() + Vector3(2,0,2));
@@ -57,7 +57,7 @@ void GooseObject::Update(float dt) {
 	if (caught) {
 		GetTransform().SetWorldPosition(spawnPos);
 		caught = false;
-		this->SetLayer(layer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
+		this->SetLayer(m_Layer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
 		uint32_t tempLayer = holdingObject->GetLayer();
 		holdingObject->SetLayer(tempLayer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
 		isHoldingBonus = false;
@@ -71,14 +71,14 @@ void GooseObject::Update(float dt) {
 		if (holdingObject->GetTransform().GetWorldPosition().x < homeBoundary.x && holdingObject->GetTransform().GetWorldPosition().z > homeBoundary.y) {
 			game->DeleteObject(holdingObject);
 			holdingObject = nullptr;
-			this->SetLayer(layer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
+			this->SetLayer(m_Layer &= ~DISABLE_OBJECT_OBJECT_COL_LAYER);
 			if (isHoldingBonus)
 				isHoldingBonus = false;
 		}
 
 	}
 	
-	if (debugInfo) {
+	if (m_DebugInfo) {
 
 		Debug::DrawLine(Vector3(homeBoundary.x, 0, homeBoundary.y), Vector3(homeBoundary.x, 30, homeBoundary.y), Vector4(1.0f, 0.0f, 1.0f, 1.0f));
 	}
@@ -192,7 +192,7 @@ void GooseObject::TransverseScaredPath() {
 	direction.y = 0;
 	GetPhysicsObject()->AddForce(direction * 100);
 
-	if (debugInfo) {
+	if (m_DebugInfo) {
 		Debug::DrawLine(currentPos, targetPos, Vector4(1, 0.55, 0, 1));
 		Debug::DrawLine(currentPos, currentPos + Vector3(0, 40, 0), Vector4(1, 0, 0, 1));
 		Debug::DrawLine(targetPos, targetPos + Vector3(0, 40, 0), Vector4(1, 1, 0, 1));

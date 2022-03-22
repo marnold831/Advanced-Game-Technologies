@@ -21,63 +21,77 @@ namespace NCL {
 
 			virtual void Update(float dt);
 
-			void SetBoundingVolume(CollisionVolume* vol) {
-				boundingVolume = vol;
+			void SetBoundingVolume(CollisionVolume* vol) 
+			{
+				m_BoundingVolume = vol;
 			}
 
-			const CollisionVolume* GetBoundingVolume() const {
-				return boundingVolume;
+			const CollisionVolume* GetBoundingVolume() const 
+			{
+				return m_BoundingVolume;
 			}
 
-			bool IsActive() const {
-				return isActive;
+			bool IsActive() const 
+			{
+				return m_IsActive;
 			}
 
-			const Transform& GetConstTransform() const {
-				return transform;
+			const Transform& GetTransform() const 
+			{
+				return m_Transform;
 			}
 
-			Transform& GetTransform() {
-				return transform;
+			Transform& GetTransform() 
+			{
+				return m_Transform;
 			}
 
-			RenderObject* GetRenderObject() const {
-				return renderObject;
+			RenderObject* GetRenderObject() const 
+			{
+				return m_RenderObject;
 			}
 
-			PhysicsObject* GetPhysicsObject() const {
-				return physicsObject;
+			PhysicsObject* GetPhysicsObject() const 
+			{
+				return m_PhysicsObject;
 			}
 
-			NetworkObject* GetNetworkObject() const {
-				return networkObject;
+			NetworkObject* GetNetworkObject() const 
+			{
+				return m_NetworkObject;
 			}
 
-			void SetRenderObject(RenderObject* newObject) {
-				renderObject = newObject;
+			void SetRenderObject(RenderObject* newObject) 
+			{
+				m_RenderObject = newObject;
 			}
 
-			void SetPhysicsObject(PhysicsObject* newObject) {
-				physicsObject = newObject;
+			void SetPhysicsObject(PhysicsObject* newObject) 
+			{
+				m_PhysicsObject = newObject;
 			}
 
-			const string& GetName() const {
-				return name;
+			const string& GetName() const 
+			{
+				return m_Name;
 			}
 
-			uint32_t GetLayer() const {
-				return layer;
+			uint32_t GetLayer() const 
+			{
+				return m_Layer;
 			}
 
-			void SetDebug(bool mode) { debugInfo = mode; }
+			void SetDebug(bool mode) { m_DebugInfo = mode; }
 
-			void SetLayer(uint32_t _layer) { layer = _layer; }
+			void SetLayer(uint32_t _layer) { m_Layer = _layer; }
 
-			virtual void OnCollisionBegin(GameObject* otherObject) {
+			virtual void OnCollisionBegin(GameObject* otherObject) 
+			{
 				//std::cout << "OnCollisionBegin event occured!\n";
 			}
 
-			virtual void OnCollisionEnd(GameObject* otherObject) {
+			virtual void OnCollisionEnd(GameObject* otherObject) 
+			{
 				//std::cout << "OnCollisionEnd event occured!\n";
 			}
 
@@ -86,19 +100,19 @@ namespace NCL {
 			void UpdateBroadphaseAABB();
 
 		protected:
-			Transform			transform;
+			Transform			m_Transform;
 
-			CollisionVolume*	boundingVolume;
-			PhysicsObject*		physicsObject;
-			RenderObject*		renderObject;
-			NetworkObject*		networkObject;
+			CollisionVolume*	m_BoundingVolume;
+			PhysicsObject*		m_PhysicsObject;
+			RenderObject*		m_RenderObject;
+			NetworkObject*		m_NetworkObject;
 
-			bool	isActive;
-			bool	debugInfo;
-			string	name;
-			uint32_t layer;
+			bool	m_IsActive;
+			bool	m_DebugInfo;
+			string	m_Name;
+			uint32_t m_Layer;
 
-			Vector3 broadphaseAABB;
+			Vector3 m_BroadphaseAABB;
 		};
 	}
 }

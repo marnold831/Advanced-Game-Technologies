@@ -20,7 +20,7 @@ bool CollisionDetection::RayPlaneIntersection(const Ray& r, const Plane& p, RayC
 }
 
 bool CollisionDetection::RayIntersection(const Ray& r, GameObject& object, RayCollision& collision) {
-	const Transform& transform = object.GetConstTransform();
+	const Transform& transform = object.GetTransform();
 	const CollisionVolume* volume = object.GetBoundingVolume();
 
 	if (!volume)
@@ -139,8 +139,8 @@ bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, Collis
 	collisionInfo.a = a;
 	collisionInfo.b = b;
 
-	const Transform& transformA = a->GetConstTransform();
-	const Transform& transformB = b->GetConstTransform();
+	const Transform& transformA = a->GetTransform();
+	const Transform& transformB = b->GetTransform();
 
 	VolumeType pairType = (VolumeType)((int)volA->type | (int)volB->type);
 
@@ -281,8 +281,8 @@ bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const
 
 bool CollisionDetection::OBBIntersection(const GameObject* objectA, const GameObject* objectB, CollisionInfo& collisionInfo) 
 {
-	Transform transformObjectA = objectA->GetConstTransform();
-	Transform transformObjectB = objectB->GetConstTransform();
+	Transform transformObjectA = objectA->GetTransform();
+	Transform transformObjectB = objectB->GetTransform();
 
 	Quaternion orientationA = transformObjectA.GetWorldOrientation();
 	Quaternion orientationB = transformObjectB.GetWorldOrientation();;
