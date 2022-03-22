@@ -151,7 +151,7 @@ bool CollisionDetection::ObjectIntersection(GameObject* a, GameObject* b, Collis
 		return SphereIntersection((SphereVolume&)* volA, transformA, (SphereVolume&)* volB, transformB, collisionInfo);
 
 	if (pairType == VolumeType::OOBB)
-		std::cout << "OOBB CollisionDetection " << OBBIntersection((OOBBVolume&)* volA, transformA, (OOBBVolume&)* volB, transformB, collisionInfo) << std::endl;
+		std::cout << "OOBB CollisionDetection " << OBBIntersection(a, b, collisionInfo) << std::endl;
 	
 	if (volA->type == VolumeType::AABB && volB->type == VolumeType::Sphere)
 		return AABBSphereIntersection((AABBVolume&)* volA, transformA, (SphereVolume&)* volB, transformB, collisionInfo);
@@ -279,17 +279,21 @@ bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const
 	return false;
 }
 
-bool CollisionDetection::OBBIntersection(const OOBBVolume& volumeA, const Transform& worldTransformA, const OOBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
-	Quaternion orientationA = worldTransformA.GetWorldOrientation();
-	Quaternion orientationB = worldTransformB.GetWorldOrientation();
+bool CollisionDetection::OBBIntersection(const GameObject* objectA, const GameObject* objectB, CollisionInfo& collisionInfo) 
+{
+	Transform transformObjectA = objectA->GetConstTransform();
+	Transform transformObjectB = objectB->GetConstTransform();
+
+	Quaternion orientationA = transformObjectA.GetWorldOrientation();
+	Quaternion orientationB = transformObjectB.GetWorldOrientation();;
 
 
-	Vector3 posA = worldTransformA.GetWorldPosition();
-	Vector3 posB = worldTransformB.GetWorldPosition();
+	Vector3 posA = transformObjectA.GetWorldPosition();
+	Vector3 posB = transformObjectB.GetWorldPosition();
 
-	Vector3 relativePos = worldTransformB.GetWorldPosition() - worldTransformA.GetWorldPosition();
-	Vector3 halfDimensionsA = volumeA.GetHalfDimensions();
-	Vector3 halfDimensionsB = volumeB.GetHalfDimensions();
+	Vector3 relativePos = posB - posA;
+	Vector3 halfDimensionsA = ((OOBBVolume*)objectA->GetBoundingVolume())->GetHalfDimensions();
+	Vector3 halfDimensionsB = ((OOBBVolume*)objectB->GetBoundingVolume())->GetHalfDimensions();
 
 	static const Vector3 face[3] = {
 		Vector3(1, 0, 0),

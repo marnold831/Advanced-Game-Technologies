@@ -82,8 +82,7 @@ namespace NCL {
 		static bool AABBSphereIntersection(	const AABBVolume& volumeA	 , const Transform& worldTransformA,
 										const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
 
-		static bool OBBIntersection(const OOBBVolume& volumeA, const Transform& worldTransformA,
-			const OOBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo);
+		static bool OBBIntersection(const GameObject* A, const GameObject* B, CollisionInfo& collisionInfo);
 
 
 		static bool OBBSeperatingPlane(Vector3 relativePos, Vector3 plane, Vector3 halfSizeA, Vector3 halfSizeB, Vector3 faceA[], Vector3 faceB[], float& penetrationDist);
